@@ -1,10 +1,12 @@
 //If you would like to, you can create a variable to store the API_URL here.
 //This is optional. if you do not want to, skip this and move on.
 
-
 /////////////////////////////
 /*This looks like a good place to declare any state or global variables you might need*/
+const playerList = document.querySelector("#puppybowl-container");
+const playerForm = document.querySelector("#new-pup-form");
 
+let players = [];
 ////////////////////////////
 
 
@@ -16,6 +18,13 @@
  */
 const fetchAllPlayers = async () => {
   //TODO
+  try {
+    const response = await fetch("https://fsa-puppy-bowl.herokuapp.com/api/2501-ftb-et-web-am/players")
+    const json = await response.json()
+    return json.data.players;
+  } catch (error) {
+    console.error(error)
+  }
 
 };
 
@@ -27,7 +36,18 @@ const fetchAllPlayers = async () => {
  */
 const fetchSinglePlayer = async (playerId) => {
   //TODO
+  try {
+    const response = await fetch(`https://fsa-puppy-bowl.herokuapp.com/api/2501-ftb-et-web-am/players/${playerId}`)
+    const json = await response.json()
+    return json.data.player;
+
+  } catch (error) {
+    console.error(error)
+  }
 };
+
+
+
 
 /**
  * Adds a new player to the roster via the API.
@@ -50,7 +70,41 @@ const fetchSinglePlayer = async (playerId) => {
 
 const addNewPlayer = async (newPlayer) => {
   //TODO
+  try {
+    const response = await fetch("https://fsa-puppy-bowl.herokuapp.com/api/2501-ftb-et-web-am/players", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(newPlayer)
+    });
+    const data = await response.json();
+    console.log("Player added:", data);
+
+  } catch (error) {
+    console.error(error);
+  }
 };
+
+playerForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const newPlayer = {
+    name: event.target.name.value,
+    imageUrl: event.target.imageUrl.value,
+    id: event.target.id.value,
+    breed: event.target.breed.value,
+    team: event.target.team.value,
+  };
+
+  await addNewPlayer(newPlayer);
+
+  players = await fetchAllPlayers();
+
+  render();
+
+  event.target.reset();
+});
 
 /**
  * Removes a player from the roster via the API.
@@ -68,7 +122,19 @@ const addNewPlayer = async (newPlayer) => {
 
 const removePlayer = async (playerId) => {
   //TODO
+  try {
+    const response = await fetch(`https://fsa-puppy-bowl.herokuapp.com/api/2501-ftb-et-web-am/players/${playerId}`, {
+      method: "DELETE"
+    });
 
+    const data = await response.json();
+    console.log("Player removed:", data);
+
+    players = await fetchAllPlayers();
+    render();
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 /**
@@ -92,7 +158,46 @@ const removePlayer = async (playerId) => {
 const render = () => {
   // TODO
 
-  
+  if (!players || players.length === 0) {
+    container.innerHTML = "<p>There are currently no players</p>";
+    return;
+  }
+
+  const html = players.map(player => {
+    return `
+      <div class="playerCard" data-id="${player.id}">
+      <img src="${player.imageUrl}" alt="${player.name}" />
+      <h2>${player.name}</h2>
+      <h3>Id: ${player.id}</h3>
+      <button class="delete-btn" data-id="${player.id}">Delete</button>
+      </div>
+    `
+  }).join("");
+
+  playerList.innerHTML = html;
+
+  const playerCard = document.querySelectorAll(".playerCard");
+  console.log("Cards found:", playerCard.length);
+
+  playerCard.forEach(card => {
+    card.addEventListener("click", async () => {
+      console.log("Card clicked!");
+      const playerId = card.dataset.id;
+      const player = await fetchSinglePlayer(playerId);
+      renderSinglePlayer(player);
+
+    });
+  });
+
+  const deleteButtons = document.querySelectorAll(".delete-btn");
+  deleteButtons.forEach(button => {
+    button.addEventListener("click", async (event) => {
+      event.stopPropagation();
+      const playerId = button.dataset.id;
+      await removePlayer(playerId);
+    });
+  });
+
 };
 
 /**
@@ -111,7 +216,23 @@ const render = () => {
  */
 const renderSinglePlayer = (player) => {
   // TODO
-
+  console.log("Rendering player:", player);
+  playerList.innerHTML = `
+  <div class="playerDetails"> 
+  <h2>${player.name}</h2>
+  <img src="${player.imageUrl}" alt="${player.name}" />
+    <ul>
+      <li>ID: ${player.id}</li>
+      <li>Breed: ${player.breed}</li>
+     <li>Team: ${player.team?.name || "No team"}</li>
+    </ul>
+    <button id="back">Back to all players</button>
+  </div>
+  `
+  const backBtn = document.querySelector("#back")
+  backBtn.addEventListener("click", () => {
+    render();
+  });
 };
 
 
@@ -121,7 +242,7 @@ const renderSinglePlayer = (player) => {
  */
 const init = async () => {
   //Before we render, what do we always need...?
-
+  players = await fetchAllPlayers();
   render();
 
 };

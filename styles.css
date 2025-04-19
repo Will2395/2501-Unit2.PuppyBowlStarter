@@ -1,10 +1,96 @@
-*{
+* {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
 }
 
-img{
-  width: 33%;
-  height: 33%;
+img {
+  width: 200px;
+}
+
+#puppybowl-container {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 15px;
+}
+
+.playerCard {
+  border: solid black 1px;
+  height: 390px;
+  width: 215px;
+  margin: 15px;
+  padding: 5px;
+}
+
+.playerDetails {
+  border: solid black 1px;
+  min-height: 480px;
+  width: 235px;
+  margin: 15px;
+  padding: 15px;
+}
+
+.playerDetails img {
+  margin: 10px auto;
+}
+
+.playerDetails ul {
+  margin-left: 15px;
+}
+
+.playerDetails button {
+  margin: 10px;
+  height: 30px;
+  width: 150px;
+}
+
+h1 {
+  margin: 15px;
+}
+
+.main-h2 {
+  margin: 20px;
+}
+
+#new-pup-form {
+  width: 400px;
+  margin: 20px;
+  text-align: right;
+}
+
+#new-pup-box {
+  margin-left: 30px;
+  margin-bottom: 30px;
+  border: 1px solid black;
+  width: 450px;
+}
+
+.form-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+label {
+  width: 100px;
+  margin-right: 10px;
+  text-align: left;
+}
+
+input {
+  flex: 1;
+  padding: 5px 10px;
+}
+
+#submit-btn {
+  text-align: center;
+}
+
+#submit-btn button {
+  font-size: 15px;
+  border-radius: 5px;
+  height: 30px;
+  width: 90px;
+  background-color: lightgray;
 }
